@@ -1,4 +1,4 @@
-PROGRAM = thermostat
+PROGRAM = water_heater
 
 EXTRA_COMPONENTS = \
 	extras/dht \
