@@ -104,11 +104,11 @@ void top_light_on_set(homekit_value_t value);
 void bottom_light_on_set(homekit_value_t value);
 
 homekit_characteristic_t top_light_on = HOMEKIT_CHARACTERISTIC_(
-    ON, true,
+    ON, false,
     .setter=top_light_on_set,
 );
 homekit_characteristic_t bottom_light_on = HOMEKIT_CHARACTERISTIC_(
-    ON, true,
+    ON, false,
     .setter=bottom_light_on_set,
 );
 
@@ -158,8 +158,8 @@ void gpio_init() {
 
     gpio_enable(relay0_gpio, GPIO_OUTPUT);
     gpio_enable(relay1_gpio, GPIO_OUTPUT);
-    relay_write(relay0_gpio, true);
-    relay_write(relay1_gpio, true);
+    relay_write(relay0_gpio, false);
+    relay_write(relay1_gpio, false);
 }
 
 void toggle_callback(uint8_t gpio) {
@@ -242,13 +242,18 @@ void create_accessory_name() {
     name.value = HOMEKIT_STRING(name_value);
 }
 
+void delay_init() {
+    vTaskDelay(2*60*1000 / portTICK_PERIOD_MS);
+    vTaskDelete(NULL);
+}
+
 void user_init(void) {
     uart_set_baud(0, 115200);
 
     create_accessory_name();
-
     gpio_init();
-
+    delay_init();
+    
     // wifi_config_init("dual lamp", NULL, on_wifi_ready);
     wifi_init();
     on_wifi_ready();
