@@ -313,10 +313,16 @@ void create_accessory_name() {
     name.value = HOMEKIT_STRING(name_value);
 }
 
+void delay_init() {
+    vTaskDelay(2*60*1000 / portTICK_PERIOD_MS);
+    vTaskDelete(NULL);
+}
+
 void user_init(void) {
     uart_set_baud(0, 115200);
 
     create_accessory_name();
+    delay_init();
 
     wifi_init();
     thermostat_init();
