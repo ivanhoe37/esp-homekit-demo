@@ -166,7 +166,7 @@ homekit_accessory_t *accessories[] = {
 
 homekit_server_config_t config = {
     .accessories = accessories,
-    .password = "111-11-111"
+    .password = "134-37-147"
 };
 
 void on_wifi_ready() {

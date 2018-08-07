@@ -183,7 +183,7 @@ homekit_accessory_t *accessories[] = {
 
 homekit_server_config_t config = {
     .accessories = accessories,
-    .password = "190-11-978"    //changed tobe valid
+    .password = "134-37-147"    //changed tobe valid
 //    .password = "111-11-111"    //default easy
 };
 
