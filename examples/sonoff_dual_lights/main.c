@@ -222,7 +222,7 @@ homekit_accessory_t *accessories[] = {
 
 homekit_server_config_t config = {
     .accessories = accessories,
-    .password = "111-11-111"
+    .password = "134-37-147"
 };
 
 void on_wifi_ready() {
@@ -243,8 +243,7 @@ void create_accessory_name() {
 }
 
 void delay_init() {
-    vTaskDelay(2*60*1000 / portTICK_PERIOD_MS);
-    vTaskDelete(NULL);
+    vTaskDelay(1200 / portTICK_PERIOD_MS);
 }
 
 void user_init(void) {
@@ -252,11 +251,12 @@ void user_init(void) {
 
     create_accessory_name();
     gpio_init();
-    delay_init();
-    
-    // wifi_config_init("dual lamp", NULL, on_wifi_ready);
-    wifi_init();
-    on_wifi_ready();
+    //delay_init();
+    vTaskDelay(96000 / portTICK_PERIOD_MS);
+
+    wifi_config_init("dual lamp", NULL, on_wifi_ready);
+    //wifi_init();
+    //on_wifi_ready();
 
     if (toggle_create(button_gpio, toggle_callback)) {
         printf("Failed to initialize button\n");
