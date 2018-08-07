@@ -72,16 +72,16 @@ static void wifi_init() {
     sdk_wifi_station_connect();
 }
 
+void on_wifi_ready() {
+    thermostat_init();
+    homekit_server_init(&config);
+}
 
 void thermostat_identify(homekit_value_t _value) {
     printf("Thermostat identify\n");
 }
 
-
-
-
 //ETSTimer fan_timer;
-
 
 void heaterOn() {
     gpio_write(HEATER_PIN, false);
@@ -313,19 +313,16 @@ void create_accessory_name() {
     name.value = HOMEKIT_STRING(name_value);
 }
 
-void delay_init() {
-    vTaskDelay(2*60*1000 / portTICK_PERIOD_MS);
-    vTaskDelete(NULL);
-}
-
 void user_init(void) {
     uart_set_baud(0, 115200);
 
     create_accessory_name();
-    delay_init();
+    vTaskDelay(96000 / portTICK_PERIOD_MS);
 
-    wifi_init();
-    thermostat_init();
-    homekit_server_init(&config);
+    wifi_config_init("water heater", NULL, on_wifi_ready);
+
+    //wifi_init();
+    //thermostat_init();
+    //homekit_server_init(&config);
 }
 
