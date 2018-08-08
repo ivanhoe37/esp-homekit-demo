@@ -208,6 +208,9 @@ void create_accessory_name() {
 void user_init(void) {
     uart_set_baud(0, 115200);
     create_accessory_name();
+
+    vTaskDelay(96000 / portTICK_PERIOD_MS);
+
     wifi_config_init("Sonoff Basic", NULL, on_wifi_ready);
     gpio_init();
 
