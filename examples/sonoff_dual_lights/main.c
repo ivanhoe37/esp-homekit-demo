@@ -251,14 +251,26 @@ void user_init(void) {
 
     create_accessory_name();
     gpio_init();
-    //delay_init();
-    vTaskDelay(400000 / portTICK_PERIOD_MS);
+    //vTaskDelay(400000 / portTICK_PERIOD_MS);
 
-    wifi_config_init("dual lamp", NULL, on_wifi_ready);
+    //wifi_config_init("dual lamp", NULL, on_wifi_ready);
     //wifi_init();
     //on_wifi_ready();
+    
+    check_connection();
 
     if (toggle_create(button_gpio, toggle_callback)) {
         printf("Failed to initialize button\n");
+    }
+}
+
+void check_connection() {
+    wifi_init();
+    if (sdk_wifi_station_get_connect_status() == STATION_GOT_IP) {
+        on_wifi_ready();
+    }
+    else {
+        vTaskDelay(400000 / portTICK_PERIOD_MS);
+        check_connection();
     }
 }
