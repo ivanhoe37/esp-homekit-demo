@@ -265,12 +265,26 @@ void user_init(void) {
 }
 
 void check_connection() {
-    wifi_init();
-    if (sdk_wifi_station_get_connect_status() == STATION_GOT_IP) {
-        on_wifi_ready();
+    char *wifi_ssid = NULL;
+    char *wifi_password = NULL;
+    sysparam_get_string("wifi_ssid", &wifi_ssid);
+    sysparam_get_string("wifi_password", &wifi_password);
+
+    if (!wifi_ssid) {
+        DEBUG("No configuration found");
+        if (wifi_password)
+            free(wifi_password);
+        wifi_config_init("dual lamp", NULL, on_wifi_ready);
     }
+
     else {
-        vTaskDelay(400000 / portTICK_PERIOD_MS);
-        check_connection();
+        wifi_init();
+        if (sdk_wifi_station_get_connect_status() == STATION_GOT_IP) {
+            on_wifi_ready();
+        }
+        else {
+            vTaskDelay(96000 / portTICK_PERIOD_MS);
+            check_connection();
+        }
     }
 }
