@@ -61,7 +61,7 @@ void relay_write(int relay, bool on) {
 void led_write(bool on) {
     gpio_write(led_gpio, on ? 0 : 1);
 }
-
+/*
 void reset_configuration_task() {
     //Flash the LED first before we start the reset
     for (int i=0; i<3; i++) {
@@ -94,9 +94,7 @@ void reset_configuration() {
     printf("Resetting Sonoff configuration\n");
     xTaskCreate(reset_configuration_task, "Reset configuration", 256, NULL, 2, NULL);
 }
-
-
-
+*/
 
 int lamp_state = 3;
 
