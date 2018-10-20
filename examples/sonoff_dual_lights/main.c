@@ -31,7 +31,6 @@
 // #include <wifi_config.h>
 
 #include "toggle.h"
-#include "button.h"
 #include "wifi.h"
 
 
@@ -54,8 +53,6 @@ const int led_gpio = 13;
 // The GPIO pin that is oconnected to the button on the Sonoff Dual R2
 const int button_gpio = 9;
 
-void button_callback(uint8_t gpio, button_event_t event);
-void check_connection();
 
 void relay_write(int relay, bool on) {
     gpio_write(relay, on ? 1 : 0);
@@ -76,7 +73,7 @@ void reset_configuration_task() {
 
     // printf("Resetting Wifi Config\n");
 
-    wifi_config_reset();
+    // wifi_config_reset();
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
@@ -169,23 +166,6 @@ void toggle_callback(uint8_t gpio) {
     lamp_state_set(lamp_state+1);
 }
 
-void button_callback(uint8_t gpio, button_event_t event) {
-    switch (event) {
-        case button_event_single_press:
-            //printf("Toggling relay due to button at GPIO %2d\n", gpio);
-            //switch_on.value.bool_value = !switch_on.value.bool_value;
-            //relay_write(switch_on.value.bool_value);
-            //homekit_characteristic_notify(&switch_on, switch_on.value);
-            lamp_state_set(lamp_state+1);
-            break;
-        case button_event_long_press:
-            reset_configuration();
-            break;
-        default:
-            printf("Unknown button event: %d\n", event);
-    }
-}
-
 void lamp_identify_task(void *_args) {
     // We identify the Sonoff by turning top light on
     // and flashing with bottom light
@@ -271,44 +251,26 @@ void user_init(void) {
 
     create_accessory_name();
     gpio_init();
-    //vTaskDelay(400000 / portTICK_PERIOD_MS);
+    vTaskDelay(400000 / portTICK_PERIOD_MS);
 
-    //wifi_config_init("dual lamp", NULL, on_wifi_ready);
+    wifi_config_init("dual lamp", NULL, on_wifi_ready);
     //wifi_init();
     //on_wifi_ready();
     
-    check_connection();
+    //check_connection();
 
-    //if (toggle_create(button_gpio, toggle_callback)) {
-    //    printf("Failed to initialize button\n");
-    //}
-
-    if (button_create(button_gpio, 0, 4000, button_callback)) {
+    if (toggle_create(button_gpio, toggle_callback)) {
         printf("Failed to initialize button\n");
     }
 }
 
 void check_connection() {
-    char *wifi_ssid = NULL;
-    char *wifi_password = NULL;
-    sysparam_get_string("wifi_ssid", &wifi_ssid);
-    sysparam_get_string("wifi_password", &wifi_password);
-
-    if (!wifi_ssid) {
-        //DEBUG("No configuration found");
-        if (wifi_password)
-            free(wifi_password);
-        wifi_config_init("dual lamp", NULL, on_wifi_ready);
+    wifi_config_init("dual lamp", NULL, on_wifi_ready);
+    if (sdk_wifi_station_get_connect_status() == STATION_GOT_IP) {
+        on_wifi_ready();
     }
-
     else {
-        wifi_init();
-        if (sdk_wifi_station_get_connect_status() == STATION_GOT_IP) {
-            on_wifi_ready();
-        }
-        else {
-            vTaskDelay(96000 / portTICK_PERIOD_MS);
-            check_connection();
-        }
+        vTaskDelay(96000 / portTICK_PERIOD_MS);
+        check_connection();
     }
 }
