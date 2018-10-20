@@ -166,6 +166,23 @@ void toggle_callback(uint8_t gpio) {
     lamp_state_set(lamp_state+1);
 }
 
+void button_callback(uint8_t gpio, button_event_t event) {
+    switch (event) {
+        case button_event_single_press:
+            //printf("Toggling relay due to button at GPIO %2d\n", gpio);
+            //switch_on.value.bool_value = !switch_on.value.bool_value;
+            //relay_write(switch_on.value.bool_value);
+            //homekit_characteristic_notify(&switch_on, switch_on.value);
+            lamp_state_set(lamp_state+1);
+            break;
+        case button_event_long_press:
+            reset_configuration();
+            break;
+        default:
+            printf("Unknown button event: %d\n", event);
+    }
+}
+
 void lamp_identify_task(void *_args) {
     // We identify the Sonoff by turning top light on
     // and flashing with bottom light
@@ -259,7 +276,11 @@ void user_init(void) {
     
     check_connection();
 
-    if (toggle_create(button_gpio, toggle_callback)) {
+    //if (toggle_create(button_gpio, toggle_callback)) {
+    //    printf("Failed to initialize button\n");
+    //}
+
+    if (button_create(button_gpio, 0, 4000, button_callback)) {
         printf("Failed to initialize button\n");
     }
 }
