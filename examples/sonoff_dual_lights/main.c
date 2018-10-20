@@ -73,7 +73,7 @@ void reset_configuration_task() {
 
     // printf("Resetting Wifi Config\n");
 
-    // wifi_config_reset();
+    wifi_config_reset();
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
