@@ -251,13 +251,13 @@ void user_init(void) {
 
     create_accessory_name();
     gpio_init();
-    //vTaskDelay(400000 / portTICK_PERIOD_MS);
+    vTaskDelay(400000 / portTICK_PERIOD_MS);
 
-    //wifi_config_init("dual lamp", NULL, on_wifi_ready);
+    wifi_config_init("dual lamp", NULL, on_wifi_ready);
     //wifi_init();
     //on_wifi_ready();
     
-    check_connection();
+    //check_connection();
 
     if (toggle_create(button_gpio, toggle_callback)) {
         printf("Failed to initialize button\n");
