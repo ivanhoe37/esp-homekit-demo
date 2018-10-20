@@ -266,10 +266,7 @@ void user_init(void) {
 
 void check_connection() {
     wifi_config_init("dual lamp", NULL, on_wifi_ready);
-    if (sdk_wifi_station_get_connect_status() == STATION_GOT_IP) {
-        on_wifi_ready();
-    }
-    else {
+    if (sdk_wifi_station_get_connect_status() != STATION_GOT_IP) {
         vTaskDelay(96000 / portTICK_PERIOD_MS);
         check_connection();
     }
