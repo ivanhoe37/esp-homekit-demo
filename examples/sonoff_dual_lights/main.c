@@ -271,7 +271,7 @@ void check_connection() {
     sysparam_get_string("wifi_password", &wifi_password);
 
     if (!wifi_ssid) {
-        DEBUG("No configuration found");
+        //DEBUG("No configuration found");
         if (wifi_password)
             free(wifi_password);
         wifi_config_init("dual lamp", NULL, on_wifi_ready);

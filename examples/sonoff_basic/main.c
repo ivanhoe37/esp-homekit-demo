@@ -65,7 +65,7 @@ void reset_configuration_task() {
     
     printf("Resetting Wifi Config\n");
     
-    wifi_config_reset();
+    // wifi_config_reset();
     
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     
@@ -191,7 +191,7 @@ void user_init(void) {
 
     create_accessory_name();
 
-    vTaskDelay(96000 / portTICK_PERIOD_MS);
+    vTaskDelay(400000 / portTICK_PERIOD_MS);
     
     wifi_config_init("sonoff-switch", NULL, on_wifi_ready);
     gpio_init();
