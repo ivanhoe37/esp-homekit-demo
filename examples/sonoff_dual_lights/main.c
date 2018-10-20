@@ -31,6 +31,7 @@
 // #include <wifi_config.h>
 
 #include "toggle.h"
+#include "button.h"
 #include "wifi.h"
 
 
@@ -53,6 +54,8 @@ const int led_gpio = 13;
 // The GPIO pin that is oconnected to the button on the Sonoff Dual R2
 const int button_gpio = 9;
 
+void button_callback(uint8_t gpio, button_event_t event);
+void check_connection();
 
 void relay_write(int relay, bool on) {
     gpio_write(relay, on ? 1 : 0);
