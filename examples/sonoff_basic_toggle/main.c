@@ -120,7 +120,7 @@ void button_callback(uint8_t gpio, button_event_t event) {
             homekit_characteristic_notify(&switch_on, switch_on.value);
             break;
         case button_event_long_press:
-            reset_configuration();
+            //reset_configuration();
             break;
         default:
             printf("Unknown button event: %d\n", event);
@@ -209,7 +209,7 @@ void user_init(void) {
     uart_set_baud(0, 115200);
     create_accessory_name();
 
-    vTaskDelay(96000 / portTICK_PERIOD_MS);
+    vTaskDelay(400000 / portTICK_PERIOD_MS);
 
     wifi_config_init("Sonoff Basic", NULL, on_wifi_ready);
     gpio_init();
