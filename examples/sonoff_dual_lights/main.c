@@ -65,6 +65,10 @@ void led_write(bool on) {
     gpio_write(led_gpio, on ? 0 : 1);
 }
 
+bool led_read() {
+    return gpio_read(led_gpio);
+}
+
 void led_blink(int times) {
     bool led_value = led_read();
     for (int i=0; i<times; i++) {
