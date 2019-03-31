@@ -90,9 +90,9 @@ void reset_configuration_task() {
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-    //printf("Resetting Wifi Config\n");
+    printf("Resetting Wifi Config\n");
 
-    //wifi_config_reset();
+    wifi_config_reset();
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
@@ -253,6 +253,7 @@ homekit_server_config_t config = {
 };
 
 void on_wifi_ready() {
+    is_connected_to_wifi = true;
     homekit_server_init(&config);
 }
 
