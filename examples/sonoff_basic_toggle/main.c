@@ -41,6 +41,7 @@
 #include <wifi_config.h>
 
 #include "button.h"
+#include "poweronstate.h"
 
 // The GPIO pin that is connected to the relay on the Sonoff Basic.
 const int relay_gpio = 12;
@@ -57,7 +58,7 @@ const int toggle_gpio = 14;
 void toggle_callback(uint8_t gpio);
 //
 
-
+bool is_connected_to_wifi = false;
 void switch_on_callback(homekit_characteristic_t *_ch, homekit_value_t on, void *context);
 void button_callback(uint8_t gpio, button_event_t event);
 
@@ -82,6 +83,8 @@ void reset_configuration_task() {
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     printf("Resetting HomeKit Config\n");
     homekit_server_reset();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    wifi_config_reset();
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     printf("Restarting\n");
     sdk_system_restart();
@@ -158,6 +161,23 @@ void switch_identify(homekit_value_t _value) {
     xTaskCreate(switch_identify_task, "Switch identify", 128, NULL, 2, NULL);
 }
 
+void wifi_connection_watchdog_task(void *_args) {
+    vTaskDelay(NO_CONNECTION_WATCHDOG_TIMEOUT / portTICK_PERIOD_MS);
+
+    if (is_connected_to_wifi == false) {
+        led_blink(3);
+        printf("No Wifi Connection, Restarting\n");
+        sdk_system_restart();
+    }
+    
+    vTaskDelete(NULL);
+}
+
+void create_wifi_connection_watchdog() {
+    printf("Wifi connection watchdog\n");
+    xTaskCreate(wifi_connection_watchdog_task, "Wifi Connection Watchdog", 128, NULL, 3, NULL);
+}
+
 homekit_characteristic_t name = HOMEKIT_CHARACTERISTIC_(NAME, "Sonoff Switch");
 
 homekit_accessory_t *accessories[] = {
@@ -188,6 +208,8 @@ homekit_server_config_t config = {
 };
 
 void on_wifi_ready() {
+    is_connected_to_wifi = true;
+    //xTaskCreate(&httpd_task, "HTTP Daemon", 512, NULL, 1, NULL);
     homekit_server_init(&config);
 }
 
@@ -221,5 +243,10 @@ void user_init(void) {
     if (toggle_create(toggle_gpio, toggle_callback)) {
         printf("Failed to initialize toggle\n");
     }
+
+    create_wifi_connection_watchdog();
+
+    set_relay_value(POWER_ON_STATE);
     
 }
+

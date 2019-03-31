@@ -32,6 +32,7 @@
 
 #include "toggle.h"
 #include "wifi.h"
+#include "poweronstate.h"
 
 
 static void wifi_init() {
@@ -45,6 +46,8 @@ static void wifi_init() {
     sdk_wifi_station_connect();
 }
 
+#define NO_CONNECTION_WATCHDOG_TIMEOUT 600000
+bool is_connected_to_wifi = false;
 // The GPIO pin that is connected to the relay on the Sonoff Dual R2
 const int relay0_gpio = 12;
 const int relay1_gpio = 5;
@@ -61,7 +64,7 @@ void relay_write(int relay, bool on) {
 void led_write(bool on) {
     gpio_write(led_gpio, on ? 0 : 1);
 }
-/*
+
 void reset_configuration_task() {
     //Flash the LED first before we start the reset
     for (int i=0; i<3; i++) {
@@ -71,15 +74,15 @@ void reset_configuration_task() {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
-    // printf("Resetting Wifi Config\n");
-
-    // wifi_config_reset();
-
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-
     printf("Resetting HomeKit Config\n");
 
     homekit_server_reset();
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+    printf("Resetting Wifi Config\n");
+
+    wifi_config_reset();
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
@@ -190,6 +193,23 @@ void lamp_identify(homekit_value_t _value) {
     xTaskCreate(lamp_identify_task, "Lamp identify", 128, NULL, 2, NULL);
 }
 
+void wifi_connection_watchdog_task(void *_args) {
+    vTaskDelay(NO_CONNECTION_WATCHDOG_TIMEOUT / portTICK_PERIOD_MS);
+
+    if (is_connected_to_wifi == false) {
+        led_blink(3);
+        printf("No Wifi Connection, Restarting\n");
+        sdk_system_restart();
+    }
+    
+    vTaskDelete(NULL);
+}
+
+void create_wifi_connection_watchdog() {
+    printf("Wifi connection watchdog\n");
+    xTaskCreate(wifi_connection_watchdog_task, "Wifi Connection Watchdog", 128, NULL, 3, NULL);
+}
+
 homekit_characteristic_t name = HOMEKIT_CHARACTERISTIC_(NAME, "Dual Lamp");
 
 homekit_accessory_t *accessories[] = {
@@ -252,20 +272,10 @@ void user_init(void) {
     vTaskDelay(400000 / portTICK_PERIOD_MS);
 
     wifi_config_init("dual lamp", NULL, on_wifi_ready);
-    //wifi_init();
-    //on_wifi_ready();
     
-    //check_connection();
+    create_wifi_connection_watchdog();
 
     if (toggle_create(button_gpio, toggle_callback)) {
         printf("Failed to initialize button\n");
-    }
-}
-
-void check_connection() {
-    wifi_config_init("dual lamp", NULL, on_wifi_ready);
-    if (sdk_wifi_station_get_connect_status() != STATION_GOT_IP) {
-        vTaskDelay(96000 / portTICK_PERIOD_MS);
-        check_connection();
     }
 }
