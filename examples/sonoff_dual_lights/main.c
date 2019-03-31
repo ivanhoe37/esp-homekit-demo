@@ -65,14 +65,20 @@ void led_write(bool on) {
     gpio_write(led_gpio, on ? 0 : 1);
 }
 
-void reset_configuration_task() {
-    //Flash the LED first before we start the reset
-    for (int i=0; i<3; i++) {
+void led_blink(int times) {
+    bool led_value = led_read();
+    for (int i=0; i<times; i++) {
         led_write(true);
         vTaskDelay(100 / portTICK_PERIOD_MS);
         led_write(false);
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
+    led_write(led_value);
+}
+
+void reset_configuration_task() {
+    //Flash the LED first before we start the reset
+    led_blink(3);
 
     printf("Resetting HomeKit Config\n");
 
