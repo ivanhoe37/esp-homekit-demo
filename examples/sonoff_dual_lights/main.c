@@ -80,9 +80,9 @@ void reset_configuration_task() {
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-    printf("Resetting Wifi Config\n");
+    //printf("Resetting Wifi Config\n");
 
-    wifi_config_reset();
+    //wifi_config_reset();
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
@@ -97,7 +97,6 @@ void reset_configuration() {
     printf("Resetting Sonoff configuration\n");
     xTaskCreate(reset_configuration_task, "Reset configuration", 256, NULL, 2, NULL);
 }
-*/
 
 int lamp_state = 3;
 
