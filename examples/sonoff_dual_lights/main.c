@@ -278,7 +278,7 @@ void user_init(void) {
 
     create_accessory_name();
     gpio_init();
-    vTaskDelay(400000 / portTICK_PERIOD_MS);
+    //vTaskDelay(400000 / portTICK_PERIOD_MS);
 
     wifi_config_init("dual lamp", NULL, on_wifi_ready);
     
